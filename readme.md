@@ -19,6 +19,8 @@ El repositorio está organizado de la siguiente manera:
 
 4. **main.ipynb**: Notebook de Jupyter que cubre el proceso de limpieza de los datos, exploración, análisis de correlaciones y visualización de las tendencias de los géneros y artistas.
 
+5. **presentacion.pdf**: Presentación de proyecto.
+
 ## Descripción del Proyecto
 
 Este proyecto tiene como objetivo analizar la evolución de la música a lo largo del tiempo y explorar diversas características de las canciones, como su popularidad, duración y género. El análisis se realiza a través de la limpieza y procesamiento de datos, visualización de tendencias, y el uso de técnicas de Machine Learning como el algoritmo KMeans para agrupar canciones en clusters según su duración y popularidad.
