@@ -7,7 +7,7 @@ Este proyecto tiene como objetivo analizar tendencias de géneros musicales, pop
 El repositorio está organizado de la siguiente manera:
 
 
-### Descripción de Archivos
+### Descripción de Archivos 
 
 1. **data/**: Contiene los conjuntos de datos utilizados:
    - `songs_normalize.csv`: El conjunto de datos original, descargado de Kaggle.
