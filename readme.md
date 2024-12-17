@@ -84,7 +84,10 @@ venv\Scripts\activate
 source venv/bin/activate
 
 # Instalar las dependencias
-pip install -r requirements.txt
+pip install streamlit pandas matplotlib seaborn scikit-learn
+pip install --upgrade numpy pandas
+conda update numpy pandas
 
-#ejecutar dashboard
-streamlit run dashboard_musica.py
+
+# Ejecutar dashboard
+streamlit run dashboard.py
