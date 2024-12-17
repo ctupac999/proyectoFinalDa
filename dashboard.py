@@ -2,9 +2,10 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.cluster import KMeans
 
 # Cargar el DataFrame limpio (ya procesado)
-@st.cache_data # Para mejorar la eficiencia del dashboard
+@st.cache_data  # Para mejorar la eficiencia del dashboard
 def load_data():
     # Cargar el DataFrame limpio que ya has guardado
     df = pd.read_csv('./data/archivo_limpio.csv')  # Asegúrate de reemplazar con la ruta correcta
@@ -21,11 +22,35 @@ st.write(df.describe())
 
 # Filtros interactivos
 st.sidebar.header("Filtros")
-selected_year = st.sidebar.selectbox("Seleccionar Año", sorted(df['year'].unique()), index=0)
+
+# Mostrar el año más reciente por defecto en el selectbox
+selected_year = st.sidebar.selectbox(
+    "Seleccionar Año", 
+    sorted(df['year'].unique(), reverse=True),  # Ordenamos de manera descendente
+    index=0  # El primer elemento será el año más reciente
+)
+
 selected_genre = st.sidebar.selectbox("Seleccionar Género", df['genre'].unique())
 
 # Filtrar los datos según la selección
 filtered_df = df[(df['year'] == selected_year) & (df['genre'] == selected_genre)]
+
+# Verifica si hay suficientes datos para aplicar KMeans
+if len(filtered_df) >= 3:  # Al menos 3 muestras para 3 clusters
+    # Selección de las características que usarás para el clustering (asegurarte de elegir solo columnas numéricas)
+    X = filtered_df[['duration_ms', 'popularity']]  # Ejemplo: selecciona las columnas relevantes
+
+    # Inicializar el modelo KMeans con 3 clusters
+    kmeans = KMeans(n_clusters=3, random_state=42)
+    
+    # Ajustar el modelo y predecir los clusters
+    filtered_df['cluster'] = kmeans.fit_predict(X)
+    
+    # Mostrar el DataFrame con la asignación de clusters
+    st.subheader("Clusters Asignados")
+    st.dataframe(filtered_df)
+else:
+    st.warning("No hay suficientes datos para realizar el clustering.")
 
 # Mostrar los primeros registros del dataset filtrado
 st.subheader(f"Primeras filas del dataset filtrado ({selected_genre}, {selected_year})")
@@ -66,81 +91,46 @@ st.download_button(
     mime="text/csv"
 )
 
-
-# import streamlit as st
-# import pandas as pd
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-
-# # Cargar el DataFrame (suponiendo que ya lo tienes limpiado y preparado)
-# df = pd.read_csv('./data/archivo_limpio.csv')
-
-# Filtrar los datos por género y año
+# Tendencias de popularidad por género
 genre_trends = df.groupby(['year', 'genre'])['popularity'].mean().reset_index()
 
-# Crear el gráfico de tendencias de popularidad por género
+# Gráfico de tendencias de popularidad por género
+st.subheader("Tendencias de Géneros Populares a lo Largo del Tiempo")
 fig, ax = plt.subplots(figsize=(10, 6))
 sns.lineplot(x='year', y='popularity', hue='genre', data=genre_trends, ax=ax, marker='o')
-
 ax.set_title('Tendencias de Géneros Populares a lo Largo del Tiempo')
 ax.set_xlabel('Año')
 ax.set_ylabel('Popularidad Promedio')
-
 st.pyplot(fig)
 
-
-# artistas mas pupulares
-
-# Filtrar los artistas más populares por año
-selected_year = st.selectbox('Selecciona un año:', df['year'].unique())
-
-top_artists_year = df[df['year'] == selected_year].groupby('artist')['popularity'].mean().sort_values(ascending=False).head(10)
-
-# Mostrar los artistas más populares
-st.write(f"Los 10 artistas más populares en {selected_year}:")
-st.write(top_artists_year)
-
-# Crear un gráfico de barras
+# Gráfico adicional: Evolución de la popularidad de los artistas más populares a lo largo del tiempo
+st.subheader(f"Evolución de la Popularidad de los 10 Artistas Más Populares")
+top_artists_evolution = df[df['artist'].isin(top_artists.index)]
 fig, ax = plt.subplots(figsize=(10, 6))
-top_artists_year.plot(kind='bar', ax=ax)
-
-ax.set_title(f'Artistas Más Populares en {selected_year}')
-ax.set_xlabel('Artista')
+sns.lineplot(data=top_artists_evolution, x='year', y='popularity', hue='artist', ax=ax)
+ax.set_title('Evolución de la Popularidad de los Artistas Más Populares')
+ax.set_xlabel('Año')
 ax.set_ylabel('Popularidad Promedio')
-
 st.pyplot(fig)
 
-
-# relacion entre generos y duración ajustada
-# Calcular la duración promedio por género
+# Gráfico adicional: Duración promedio de las canciones por género
+st.subheader('Duración Promedio de Canciones por Género')
 duration_by_genre = df.groupby('genre')['duration_ms'].mean().sort_values(ascending=False)
-
-# Crear un gráfico de barras de duración promedio por género
 fig, ax = plt.subplots(figsize=(10, 6))
 duration_by_genre.plot(kind='bar', ax=ax)
-
 ax.set_title('Duración Promedio de Canciones por Género')
 ax.set_xlabel('Género')
 ax.set_ylabel('Duración Promedio (ms)')
-
 st.pyplot(fig)
 
-
-# visualizacion y resumen para consultoras
-
-# Mostrar un resumen interactivo
+# Visualización para consultoras: Oportunidades de festivales según la popularidad de géneros
 st.title('Dashboard para Consultoras de Música y Festivales')
 
-# Gráfico de tendencias de géneros
+# Mostrar las tendencias de los géneros
 st.subheader('Tendencias de Géneros Populares a lo Largo del Tiempo')
-st.pyplot(fig)  # Gráfico ya generado en el paso 1
+st.pyplot(fig)
 
-# Artistas más populares
-st.subheader(f'Los 10 Artistas Más Populares en {selected_year}')
-st.write(top_artists_year)  # Los artistas generados en el paso 2
-st.pyplot(fig)  # Gráfico de barras de artistas más populares
-
-# Relación entre géneros y duración ajustada
+# Mostrar la duración por género
 st.subheader('Duración Promedio de Canciones por Género')
-st.write(duration_by_genre)  # Duración promedio por género
-st.pyplot(fig)  # Gráfico de barras de duración por género
+st.write(duration_by_genre)
+st.pyplot(fig)
