@@ -62,14 +62,6 @@ avg_duration.plot(kind='barh', ax=ax, color='lightgreen')
 ax.set_xlabel('Duración Promedio (ms)')
 st.pyplot(fig)
 
-# Scatterplot: Popularidad vs Duración
-st.subheader(f"Relación entre Popularidad y Duración en {selected_year} - {selected_genre}")
-fig, ax = plt.subplots()
-sns.scatterplot(data=filtered_df, x='duration_ms', y='popularity', hue='artist', ax=ax, palette='Set1')
-ax.set_xlabel('Duración (ms)')
-ax.set_ylabel('Popularidad')
-st.pyplot(fig)
-
 # Descargar datos filtrados
 st.download_button(
     label="Descargar Datos Filtrados",
@@ -116,4 +108,4 @@ st.subheader('Tendencias de Géneros Populares a lo Largo del Tiempo')
 st.pyplot(fig)
 
 st.subheader('Duración Promedio de Canciones por Género')
-st.write(duration_by_genre)
+st.write(duration_by_genre) 

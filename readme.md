@@ -85,3 +85,6 @@ source venv/bin/activate
 
 # Instalar las dependencias
 pip install -r requirements.txt
+
+#ejecutar dashboard
+streamlit run dashboard_musica.py
